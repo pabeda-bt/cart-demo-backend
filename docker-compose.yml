@@ -1,0 +1,41 @@
+version: '2'
+services:
+    mysql_server:
+        image: mysql:latest
+        environment:
+            - MYSQL_HOST_NAME=mysql_server
+            - MYSQL_USER=test
+            - MYSQL_DATABASE=test
+            - MYSQL_PASSWORD=123456
+            - MYSQL_ROOT_PASSWORD=123456
+        ports:
+            - "33060:3306"
+        networks:
+              adessoturkey:
+                ipv4_address: 10.5.0.2
+    web_server:
+        image: adessoturkey/php
+        volumes:
+            - ./:/var/www:rw
+            - ./public:/var/www/html:rw
+        ports:
+            - "8080:80"
+        environment:
+            XDEBUG_CONFIG: remote_host=10.5.0.1
+        networks:
+              adessoturkey:
+                ipv4_address: 10.5.0.3
+    mail_server:
+        image: schickling/mailcatcher
+        networks:
+              adessoturkey:
+                ipv4_address: 10.5.0.4
+        ports:
+            - "8081:1080"
+
+networks:
+  adessoturkey:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
